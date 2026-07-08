@@ -1,0 +1,19 @@
+from typing_extensions import final
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
+from .config import settings
+
+SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}'
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+local_session = sessionmaker(bind = engine,autoflush=False,autocommit = False)
+Base = declarative_base()
+
+def get_db():
+    """Getting the session of sqlalchemy engine"""
+    db = local_session()
+    try:
+        yield db
+    finally:
+        db.close()
